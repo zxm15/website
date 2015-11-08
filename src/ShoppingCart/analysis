@@ -1,0 +1,29 @@
+What methods can we use?
+1. cookie
+2. session
+3. database
+4. session + database
+
+cookie pros and cons
+pros: easy; loading fast as it is stored on client side;
+cons: client can change the shopping cart information; cannot serve client if they disable the cookie; once cookie is cleared, the information lost
+
+session pros and cons
+pros: safe as it is stored on the server side; easy to implement;
+cons: could lost as it is stored in memory; sticky session over a distributed application;
+
+database pros and cons
+pros: safe; persistent record; easy to implemented; shared data storage could solve the distributed system problem
+cons: slow;
+
+session + database
+combine the pros of session and database. We come up a solution with two steps.
+1. Write log;
+2. Write the updates of the shopping cart to session;
+3. batch log updates to database.
+
+pros: fast, persistent records;
+cons: still have sticky session problem
+
+
+you are wanting
