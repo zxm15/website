@@ -1,5 +1,6 @@
 <?php
 
+namespace Acme\ShoppingCart;
 class CartItem
 {
     private $id;

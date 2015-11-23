@@ -1,5 +1,7 @@
 <?php
 
+namespace Acme\ShoppingCart;
+
 class Cart
 {
     private $quantity = 0;
@@ -14,7 +16,10 @@ class Cart
      */
     public function __construct()
     {
-        unset($_SESSION['cart']);
+        if (! isset($_SESSION['cart'])) {
+            $_SESSION['cart'] = array();
+        }
+
     }
 
     /**
@@ -24,34 +29,29 @@ class Cart
     {
         $id = $item->getId();
         if ($this->hasItem($id)) {
-            $this->updateItemQuantity($item->getId(), $item->getQuantity() + $this->getItem($id)->getQuantity());
+            $this->updateItemQuantity($item->getId(), $item->getQuantity());
+            $oldItem = $this->getItem($id);
+            $oldItem->setQuantity($item->getQuantity() + $oldItem->getQuantity);
         } else {
             $_SESSION['cart'][$item->getId()] = $item;
+            $this->updateCart($item, $item->getQuantity());
         }
     }
 
-    /**
-     * @param $itemID
-     * @param $quantity
-     */
-    public function updateItemQuantity($itemID, $quantity)
-    {
-        if (!$this->hasItem($itemID))
-            throw new InvalidArgumentException('The item does not exist in your shopping cart');
-        $oldItem = $this->getItem($itemID);
-        $qtyDiff = $quantity - $oldItem->getQuantity();
-        $oldItem->setQuantity($quantity);
-        $this->updateCart($oldItem, $qtyDiff);
+    public function updateItemQuantity($itemID, $quantity) {
+        if ($quantity <= 0) throw new \InvalidArgumentException("Quantity must be larger than 0");
+        else if (! $this->hasItem($itemID)) throw new \InvalidArgumentException("The product does not exist in your cart");
+        $item = $this->getItem($itemID);
+        $this->updateCart($item, $quantity - $item->getQuantity());
+        $item->setQuantity($quantity);
     }
-
     /**
      * @param $itemID
      */
     public function removeItem($itemID)
     {
         $item = $this->getItem($itemID);
-        $qtyDiff = -1 * $item->getQuantity();
-        updateCart($item, $qtyDiff);
+        $this->updateCart($item, -1 * $item->getQuantity());
         unset($_SESSION['cart'][$itemID]);
     }
 
@@ -65,7 +65,7 @@ class Cart
         $this->subtotal += $qtyDiff * $item->getPrice();
         $this->shipping += $qtyDiff * $item->getShipping();
         $this->tax += $qtyDiff * $item->getPrice() * $this->taxRate;
-        $this->total += $qtyDiff * $item->getPrice() * (1 + $this->taxRate) + $qtyDiff * $item->getShipping();
+        $this->total = $this->subtotal + $this->shipping + $this->tax;
     }
 
     /**
@@ -75,7 +75,7 @@ class Cart
     public function getItem($itemID)
     {
         if (!$this->hasItem($itemID))
-            throw new InvalidArgumentException('The item does not exist in your shopping cart');
+            throw new \InvalidArgumentException('The item does not exist in your shopping cart');
         return $_SESSION['cart'][$itemID];
     }
 
