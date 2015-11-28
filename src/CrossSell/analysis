@@ -1,0 +1,15 @@
+use cases:
+1. create a direct graph from database and store it in memory
+2. from the graph, get the upsell and downsell given a node id
+3. get into order review step
+4. check if the graph has a loop
+
+
+node {
+    cpid
+    pid
+    name
+    node upsell
+    node downsell
+
+}

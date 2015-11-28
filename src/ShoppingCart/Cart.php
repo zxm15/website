@@ -38,6 +38,10 @@ class Cart
         }
     }
 
+    /**
+     * @param $itemID
+     * @param $quantity
+     */
     public function updateItemQuantity($itemID, $quantity) {
         if ($quantity <= 0) throw new \InvalidArgumentException("Quantity must be larger than 0");
         else if (! $this->hasItem($itemID)) throw new \InvalidArgumentException("The product does not exist in your cart");
